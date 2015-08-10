@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="SubjectAlternativeNames">
+        <item>google.com</item>
+        <item>*.google.com</item>
+        <item>*.google.de</item>
+        <item>twitter.com</item>
+        <item>*.twitter.com</item>
+        <item>facebook.com</item>
+        <item>*.facebook.com</item>
+        <item>*.blogspot.com</item>
+        <item>*.baidu.com</item>
+    </array>
+</resources>

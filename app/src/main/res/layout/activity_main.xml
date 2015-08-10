@@ -1,0 +1,122 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    tools:context="com.handhandlab.walldriller.MainActivity" >
+
+    <Button
+        android:id="@+id/btn_init"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="App Init"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/service_url"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/button_selector_white"
+        android:paddingLeft="12dp"
+        android:clickable="true"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/service_url"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/holo_blue_light"
+            android:paddingLeft="12dp"
+            android:textSize="16sp"
+            android:text="http://asdf.casg.com"/>
+    </LinearLayout>
+
+    <include layout="@layout/view_divider"/>
+
+    <Button
+        android:id="@+id/btn_proxy_apps"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="@string/proxy_apps"
+        android:background="@drawable/button_selector_white"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="12dp"
+        android:drawableRight="@drawable/control_top_right"
+        android:textSize="16sp"/>
+
+    <include layout="@layout/view_divider"/>
+
+    <Button
+        android:id="@+id/btn_san_names"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="@string/san"
+        android:background="@drawable/button_selector_white"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="12dp"
+        android:textSize="16sp"
+        android:drawableRight="@drawable/control_top_right"/>
+
+    <include layout="@layout/view_divider"/>
+
+    <Button
+        android:id="@+id/test_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Test Server"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/test_http_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="START HTTP SERVER"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/test_ssl_proxy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="START SSL PROXY SERVER"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/start_http_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/main_button"
+        android:text="@string/http_service"/>
+
+    <Button
+        android:id="@+id/start_https_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/main_button"
+        android:text="@string/https_service"/>
+
+    <Button
+        android:id="@+id/start_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/main_button"
+        android:text="@string/all_service"/>
+
+    <Button
+        android:id="@+id/stop_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/main_button"
+        android:text="@string/stop_service"
+        android:enabled="false"/>
+
+</LinearLayout>
+

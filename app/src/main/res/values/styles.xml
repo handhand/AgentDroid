@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="main_button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/button_selector</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+</resources>

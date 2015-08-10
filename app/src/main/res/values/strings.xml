@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">AgentDroid</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Create Ca</string>
+    <string name="service_url">Server Url</string>
+    <string name="proxy_apps">Proxy App</string>
+    <string name="san">Set Subject Alternative Name</string>
+    <string name="http_service">Start HTTP Proxy</string>
+    <string name="https_service">Start HTTPS Proxy</string>
+    <string name="all_service">Start Proxy</string>
+    <string name="stop_service">STOP</string>
+</resources>
