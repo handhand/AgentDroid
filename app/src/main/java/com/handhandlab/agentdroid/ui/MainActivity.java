@@ -92,8 +92,6 @@ public class MainActivity extends Activity implements ServiceConnection,View.OnC
                 break;
             //setup subject alternative names of ssl certificates
             case R.id.btn_san_names:
-                Log.d("haha","path:"+this.getFilesDir().getAbsolutePath());
-                OpensslWrapper.genCA(this.getFilesDir().getAbsolutePath()+"/");
                 i = new Intent(getApplicationContext(),SanListActivity.class);
                 startActivity(i);
                 /*Thread thread = new Thread(new DNSIntercepter());

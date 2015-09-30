@@ -46,6 +46,12 @@ public class DataUtils {
         prefs.edit().putString(name,"").commit();
     }
 
+    public static final void delSanName(Context context,String name){
+        if(TextUtils.isEmpty(name))return;
+        SharedPreferences prefs = context.getSharedPreferences(PREF,0);
+        prefs.edit().remove(name).commit();
+    }
+
     /**
      * @param context
      * @return get Subject Alternative Names from persistent storage,if none available, return a size 0 array

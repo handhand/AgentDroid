@@ -1,5 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -38,34 +44,84 @@
             android:textColor="@android:color/holo_blue_light"
             android:paddingLeft="12dp"
             android:textSize="16sp"
-            android:text="http://asdf.casg.com"/>
+            android:text="Set the php script url"/>
     </LinearLayout>
 
     <include layout="@layout/view_divider"/>
 
-    <Button
+    <RelativeLayout
         android:id="@+id/btn_proxy_apps"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:text="@string/proxy_apps"
+        android:layout_height="wrap_content"
         android:background="@drawable/button_selector_white"
-        android:gravity="center_vertical|left"
         android:paddingLeft="12dp"
-        android:drawableRight="@drawable/control_top_right"
-        android:textSize="16sp"/>
+        android:paddingTop="12dp"
+        android:paddingBottom="10dp"
+        android:textSize="16sp">
+
+        <TextView
+            android:id="@+id/tv0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textSize="16sp"
+            android:text="@string/proxy_apps"
+            android:textColor="@android:color/black"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv0"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:text="@string/proxy_apps_desc"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_margin="14dp"
+            android:textSize="18sp"
+            android:text=">"/>
+    </RelativeLayout>
 
     <include layout="@layout/view_divider"/>
 
-    <Button
+    <RelativeLayout
         android:id="@+id/btn_san_names"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:text="@string/san"
+        android:layout_height="wrap_content"
         android:background="@drawable/button_selector_white"
-        android:gravity="center_vertical|left"
         android:paddingLeft="12dp"
-        android:textSize="16sp"
-        android:drawableRight="@drawable/control_top_right"/>
+        android:paddingTop="12dp"
+        android:paddingBottom="10dp"
+        android:textSize="16sp">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textSize="16sp"
+            android:text="@string/san"
+            android:textColor="@android:color/black"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv1"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:text="@string/san_add"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_margin="14dp"
+            android:textSize="18sp"
+            android:text=">"/>
+    </RelativeLayout>
 
     <include layout="@layout/view_divider"/>
 
@@ -77,24 +133,11 @@
         android:visibility="gone"/>
 
     <Button
-        android:id="@+id/test_http_server"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="START HTTP SERVER"
-        android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/test_ssl_proxy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="START SSL PROXY SERVER"
-        android:visibility="gone"/>
-
-    <Button
         android:id="@+id/start_http_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/main_button"
+        android:background="@drawable/button_selector_yellow"
         android:text="@string/http_service"/>
 
     <Button
@@ -102,6 +145,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/main_button"
+        android:background="@drawable/button_selector_blue"
         android:text="@string/https_service"/>
 
     <Button
@@ -121,3 +165,5 @@
 
 </LinearLayout>
 
+
+</ScrollView>

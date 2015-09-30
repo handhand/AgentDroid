@@ -5,7 +5,9 @@
     <string name="action_settings">Create Ca</string>
     <string name="service_url">服务器地址</string>
     <string name="proxy_apps">代理的APP</string>
+    <string name="proxy_apps_desc">选择被代理的APP</string>
     <string name="san">设置多域名(SAN)</string>
+    <string name="san_add">添加需要访问的HTTPS网站的域名</string>
     <string name="http_service">打开HTTP代理</string>
     <string name="https_service">打开HTTPS代理</string>
     <string name="all_service">打开代理</string>

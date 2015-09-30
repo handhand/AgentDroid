@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.handhandlab.agentdroid.R;
 import com.handhandlab.agentdroid.utils.DataUtils;
@@ -20,7 +23,7 @@ import java.util.List;
 /**
  * Created by Handhand on 2015/7/15.
  */
-public class SanListActivity extends Activity implements View.OnClickListener{
+public class SanListActivity extends Activity implements View.OnClickListener,AdapterView.OnItemLongClickListener{
     ListView mListViewNames;
     List<String> mSanList = new ArrayList<>();
     SanListAdapter mAdapter;
@@ -42,6 +45,7 @@ public class SanListActivity extends Activity implements View.OnClickListener{
         //show data
         mAdapter = new SanListAdapter();
         mListViewNames.setAdapter(mAdapter);
+        mListViewNames.setOnItemLongClickListener(this);
     }
 
     @Override
@@ -53,6 +57,34 @@ public class SanListActivity extends Activity implements View.OnClickListener{
             //add to persistence
             DataUtils.addSanName(getApplicationContext(),san);
             mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Long click to remove a SAN name
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        String sanName = mSanList.remove(position);
+        DataUtils.delSanName(this, sanName);
+        Toast.makeText(this,sanName+" deleted!",Toast.LENGTH_LONG).show();
+        mAdapter.notifyDataSetChanged();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.handhandlab.agentdroid.R;
 import com.handhandlab.agentdroid.goagent.AgentClient3;
 import com.handhandlab.agentdroid.proxy.HttpProxyServer;
 import com.handhandlab.agentdroid.proxy.HttpsProxyServer;
@@ -151,9 +152,9 @@ public class ProxyService extends Service {
 
     private void showNotification(){
         NotificationCompat.Builder builder =  new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.ic_notification_clear_all)
-                .setContentTitle("AgentDroid is running")
-                .setContentText("fuck you GFW");
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("AgentDroid is Running...")
+                .setContentText("F*ck You GFW");
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, MainActivity.class);
         // The stack builder object will contain an artificial back stack for the started Activity.

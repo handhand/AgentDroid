@@ -4,9 +4,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Create Ca</string>
     <string name="service_url">Server Url</string>
-    <string name="proxy_apps">Proxy App</string>
-    <string name="san">Set Subject Alternative Name</string>
-    <string name="san_add">Add Subject Alternative Name</string>
+    <string name="proxy_apps">Proxy Apps</string>
+    <string name="proxy_apps_desc">Choose the app to be proxied</string>
+    <string name="san">Subject Alternative Name Setting</string>
+    <string name="san_add">Add the domains that you want to visit by HTTPS</string>
     <string name="http_service">Start HTTP Proxy</string>
     <string name="https_service">Start HTTPS Proxy</string>
     <string name="all_service">Start Proxy</string>
