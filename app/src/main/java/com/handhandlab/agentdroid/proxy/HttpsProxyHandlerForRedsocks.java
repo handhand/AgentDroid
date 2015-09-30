@@ -3,7 +3,6 @@ package com.handhandlab.agentdroid.proxy;
 import android.content.Context;
 import android.util.Log;
 
-import com.handhandlab.agentdroid.goagent.AgentClient2;
 import com.handhandlab.agentdroid.goagent.AgentClient3;
 
 import java.io.ByteArrayOutputStream;
@@ -15,8 +14,15 @@ import java.nio.channels.SocketChannel;
 /**
  * Handler to do HTTPS proxy
  * One channel per handler
+ * Deprecated Notes:
+ * this class is working ACTUALLY like a proxy, i.e. client must know its connecting to a proxy,
+ * since Redsocks can only tell us which ip the client is connecting to (not which HOST), this function
+ * is useless;
+ * AgentDroid won't actually know which host the client is connecting to when the ssl connection is initiating,
+ * it uses Subject Alternative Names in the certificate to work around this.
  */
-public class SSLProxyHandler implements ProxyHandler{
+@Deprecated
+public class HttpsProxyHandlerForRedsocks implements ProxyHandler{
     //handler id for debug purpose
     static int id = 0;
     public int handlerId;
@@ -39,7 +45,7 @@ public class SSLProxyHandler implements ProxyHandler{
     //it will be initialized when receiving a http CONNECT request.
     SSLEngineHelper ssl;
 
-    public SSLProxyHandler(Context context) {
+    public HttpsProxyHandlerForRedsocks(Context context) {
         //init buffer
         readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         writeBuffer = ByteBuffer.allocate(BUFFER_SIZE);
@@ -47,13 +53,18 @@ public class SSLProxyHandler implements ProxyHandler{
         handlerId = id++;
     }
 
+    @Override
+    public void onAccept(SelectionKey key, ProxyServer proxyServer) {
+
+    }
+
     /**
-     * handle read events
+     *
      * @param key
-     * @param channel
+     * @param proxyServer
      */
     @Override
-    public void onRead(SelectionKey key, final SocketChannel channel){
+    public void onRead(SelectionKey key,final ProxyServer proxyServer){
 
         /***** SSLEngineHelper object is not null, meaning the ssl tunnel has been established ******/
         if(ssl!=null){
@@ -61,7 +72,7 @@ public class SSLProxyHandler implements ProxyHandler{
                 String decodedData =  ssl.sslRead(key,channel);//let sslEngine do the reading and decrypting
                 if(decodedData!=null){
                     //decode data to an http request
-                    HandHttpRequest request = new HandHttpRequest(decodedData);
+                    HandyHttpRequest request = new HandyHttpRequest(decodedData);
 
                     //go agent!
                     AgentClient3.goAgent(new AgentClient3.AgentTask(request,this));
@@ -78,7 +89,7 @@ public class SSLProxyHandler implements ProxyHandler{
         }
 
         /******  ssl is NOT initiated yet ******/
-        this.channel = channel;
+        this.channel = (SocketChannel)key.channel();
 
         //read plain text, it SHOULD be a CONNECT request
         byte[] inData = read(key, channel);
@@ -89,21 +100,22 @@ public class SSLProxyHandler implements ProxyHandler{
         }
 
         //decode to http request
-        HandHttpRequest request = new HandHttpRequest(new String(inData));
+        HandyHttpRequest request = new HandyHttpRequest(new String(inData));
 
         if(request.method.toLowerCase().equals("connect")){
-            Log.d("haha","SSL CONNECT REQUEST:"+handlerId);
+            //Log.d("haha","SSL CONNECT REQUEST:"+handlerId);
 
             //unregister read interests, since handshakes are done in other thread and do not need selector
             key.cancel();
+            //response a plain text 200 to start a tunnel setup, according to the protocol
+            write(HTTP.RESPONSE_200.getBytes());
             //do handshake in other thread, we do not want the handshake's long running task to block the main io loop
             Runnable initSSL = new Runnable(){
                 @Override
                 public void run() {
                     try {
                         Log.d("haha","init ssl:"+handlerId);
-                        //response a plain text 200 to start a tunnel setup, according to the protocol
-                        write(HTTP.RESPONSE_200.getBytes());
+
                         /**
                          * NOTE: the following process is actually a Man In The Middle attack,
                          * as client think it's handshaking with the destination server,
@@ -117,7 +129,7 @@ public class SSLProxyHandler implements ProxyHandler{
                         //when client receive the 200 response, the handshake shall begin
                         ssl.doHandShake(channel);
                         //after handshake, re-register to do request handling in main io loop
-                        ServerSSL.regesterRead(channel,SSLProxyHandler.this);
+                        proxyServer.regesterRead(channel,HttpsProxyHandlerForRedsocks.this);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -165,7 +177,9 @@ public class SSLProxyHandler implements ProxyHandler{
     }
 
     /**
-     * synchronized because multithreading would mess up the bytebuffer, wouldn't it?
+     * write data to channel
+     * because we have SSLEngine here, we should use it to encode our data,
+     * writing is actually done by SSLEngine
      * @param data
      */
     @Override
@@ -220,5 +234,10 @@ public class SSLProxyHandler implements ProxyHandler{
     @Override
     public void onResponse() {
         //do nothing
+    }
+
+    @Override
+    public SocketChannel getChannel() {
+        return channel;
     }
 }

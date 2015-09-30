@@ -2,7 +2,7 @@ package com.handhandlab.agentdroid.deprecate;
 
 import android.util.Log;
 
-import com.handhandlab.agentdroid.proxy.HandHttpRequest;
+import com.handhandlab.agentdroid.proxy.HandyHttpRequest;
 import com.handhandlab.agentdroid.proxy.SSLEngineHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +20,7 @@ public class ConnContext {
 	//public Response resp;
 	public ByteBuffer readBuffer;
 	public ByteBuffer writeBuffer;
-	public HandHttpRequest request;
+	public HandyHttpRequest request;
 	
 	public ConnContext(){
 		readBuffer = ByteBuffer.allocate(BUFFER_SIZE);

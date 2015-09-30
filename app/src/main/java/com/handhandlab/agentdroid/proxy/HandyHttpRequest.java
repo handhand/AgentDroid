@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * representing the client http request
  */
-public class HandHttpRequest {
+public class HandyHttpRequest {
 
     //request method, GET, POST
 	String method;
@@ -25,10 +25,10 @@ public class HandHttpRequest {
 
     public String headerStr;
 	
-	public HandHttpRequest(){}
+	public HandyHttpRequest(){}
 	
-	public HandHttpRequest(String str){
-        Log.d("haha","request:"+str);
+	public HandyHttpRequest(String str){
+        //Log.d("haha","request:"+str);
 
         //find empty line
         int emptyLineIndex = str.indexOf(HTTP.EMPTY_LINE);

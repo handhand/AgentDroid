@@ -3,10 +3,10 @@ package com.handhandlab.agentdroid.goagent;
 import android.util.Log;
 
 import com.handhandlab.agentdroid.proxy.HTTP;
-import com.handhandlab.agentdroid.proxy.HandHttpRequest;
+import com.handhandlab.agentdroid.proxy.HandyHttpRequest;
 import com.handhandlab.agentdroid.proxy.HttpHelper;
 import com.handhandlab.agentdroid.proxy.ProxyHandler;
-import com.handhandlab.agentdroid.proxy.SSLProxyHandler;
+import com.handhandlab.agentdroid.proxy.HttpsProxyHandlerForRedsocks;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -118,10 +118,10 @@ public class AgentClient3 extends Thread{
         String contentType = conn.getHeaderField(CONTENT_HEADER);
         if(contentType.equals(TYPE_GIF)){
             byte[] responseData = decodeResponse(readData);
+            Log.d("haha","response:" +new String(responseData));
             task.handler.write(responseData);
             task.handler.onResponse();//callback, give a chance handler to execute some codes, e.g. close connection etc.
         }else{
-            Log.d("haha","response:" +new String(readData));
             task.handler.write(readData);
             task.handler.onResponse();
         }
@@ -140,18 +140,18 @@ public class AgentClient3 extends Thread{
      * encode body
      * @return
      */
-    public byte[] encodeBody(HandHttpRequest request,AgentTask task){
+    public byte[] encodeBody(HandyHttpRequest request,AgentTask task){
         //assemble request header, against the protocol of goagent
         StringBuilder sb = new StringBuilder();
         sb.append(request.getMethod()).append(" ");
         String path = request.getPath();
         if(path.startsWith("http")){
-            //it's a full path
+            //if browser knows it's talking to a proxy, this will be a complete url
             sb.append(path);
         }else{
             String host = request.headers.get("Host");
             String scheme = "http://";
-            if(task.handler instanceof SSLProxyHandler){
+            if(task.handler instanceof HttpsProxyHandlerForRedsocks){
                 scheme = "https://";
             }
             sb.append(scheme).append(host).append(path).append(" HTTP/1.1\r\n");//request line
@@ -211,9 +211,9 @@ public class AgentClient3 extends Thread{
     }
 
     public static class AgentTask{
-        HandHttpRequest request;
+        HandyHttpRequest request;
         ProxyHandler handler;//pass in handler instead of channel, because we might use SSL, can not directly write to channel
-        public AgentTask(HandHttpRequest request, ProxyHandler handler){
+        public AgentTask(HandyHttpRequest request, ProxyHandler handler){
             this.request = request;
             this.handler = handler;
         }

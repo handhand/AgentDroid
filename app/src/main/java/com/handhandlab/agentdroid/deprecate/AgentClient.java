@@ -12,7 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
-import com.handhandlab.agentdroid.proxy.HandHttpRequest;
+import com.handhandlab.agentdroid.proxy.HandyHttpRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class AgentClient{
     }
 
     //use volley to post request to goagent php server
-    public void postRequest(ConnContext cc,HandHttpRequest request,String url,Response.Listener listener,Response.ErrorListener errorListener){
+    public void postRequest(ConnContext cc,HandyHttpRequest request,String url,Response.Listener listener,Response.ErrorListener errorListener){
 
         AgentRequest volleyRequest = new AgentRequest(
                 Request.Method.POST,
@@ -170,7 +170,7 @@ public class AgentClient{
      * encode body
      * @return
      */
-    public byte[] encodeBody(HandHttpRequest request){
+    public byte[] encodeBody(HandyHttpRequest request){
         //assemble request header, against the protocol of goagent
         StringBuilder sb = new StringBuilder();
         sb.append(request.getMethod()).append(" ");

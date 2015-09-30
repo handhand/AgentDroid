@@ -10,4 +10,5 @@
     <string name="https_service">打开HTTPS代理</string>
     <string name="all_service">打开代理</string>
     <string name="stop_service">关闭</string>
+    <string name="prompt_set_url_first">请先设置服务器地址</string>
 </resources>

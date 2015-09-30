@@ -13,6 +13,7 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -32,6 +33,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.handhandlab.agentdroid.cert.CertHelper;
+import com.handhandlab.agentdroid.cert.NativeCertHelper;
+import com.handhandlab.agentdroid.openssl.CertWrapper;
 import com.handhandlab.agentdroid.utils.DataUtils;
 
 /**
@@ -124,17 +127,25 @@ public class SSLEngineHelper{
         if(certHashes.contains(domain)==false){
 
             X509Certificate[] certChain = new X509Certificate[1];
-            //gen key pair
-            KeyPair keyPair = CertHelper.genKeyPair();
 
             //use key pair to gen a signed cert,it depends on
             // 1, CertHelper has generated a ca and put it in /etc/security/cacerts (with proper hash names)
             // 2, keypair of ca in /data/data/com.handhandlab.agentdroid/files
-            X509Certificate cert = CertHelper.genCert(context,domain,keyPair,sanNames);
+            //java impl
+            //gen key pair
+            //KeyPair keyPair = CertHelper.genKeyPair();
+            //X509Certificate cert = CertHelper.genCert(context,domain,keyPair,sanNames);
+            //PrivateKey privateKey = keyPair.getPrivate();
+            //native openssl impl
+            CertWrapper certWrapper = NativeCertHelper.genCert(context,domain,sanNames);
+            X509Certificate cert = certWrapper.getCert();
+            PrivateKey privateKey = certWrapper.getPrivateKey();
+
             certChain[0] = cert;
+
             //an ssl keystore entry should have the private key, and the certificate (chain).
             keyStore.setEntry(domain,
-                    new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), certChain),
+                    new KeyStore.PrivateKeyEntry(privateKey, certChain),
                     new KeyStore.PasswordProtection("".toCharArray()));
 
             certHashes.add(domain);
@@ -144,7 +155,7 @@ public class SSLEngineHelper{
         //TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         //tmf.init(ts);
 
-        SSLContext sslCtx = SSLContext.getInstance("SSL");
+        SSLContext sslCtx = SSLContext.getInstance("TLS");
   
         sslCtx.init(kmf.getKeyManagers(), /*tmf.getTrustManagers()*/null, null);
   

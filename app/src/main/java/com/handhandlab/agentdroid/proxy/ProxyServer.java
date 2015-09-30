@@ -1,12 +1,28 @@
+/**
+ * Copyright 2015 Handhandlab.com
+ *
+ * This file is part of AgentDroid.
+ *
+ *  AgentDroid is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  AgentDroid is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with AgentDroid. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 package com.handhandlab.agentdroid.proxy;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.handhandlab.agentdroid.goagent.AgentClient3;
-
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.channels.Channel;
@@ -33,11 +49,11 @@ import java.util.Set;
  * NOTE: can NOT use Iptables to redirect the connection to our app directly, as we need to know where the client is connecting to first.
  */
 
-public class ProxyServer implements Runnable {
-    private Context mContext;
+public abstract class ProxyServer implements Runnable {
+    Context mContext;
 
     //nio selector
-    private static Selector selector;
+    private Selector selector;
 
     private ServerSocketChannel sschannel;
 
@@ -48,28 +64,24 @@ public class ProxyServer implements Runnable {
     private int port;
 
     //hold the re-register requests
-    private static List<SSLProxyHandler> registerList = new ArrayList<SSLProxyHandler>();
+    private List<ProxyHandler> registerList = new ArrayList<ProxyHandler>();
 
     //control the main loop
     boolean isRunning = true;
-
-    //factory to get handler object
-    HandlerFactory mHandlerFactory;
 
     /**
      * @param context Android context
      * @param port listening port
      * @throws java.io.IOException
      */
-    public ProxyServer(Context context, int port, HandlerFactory handlerFactory) throws IOException {
+    public ProxyServer(Context context, int port) throws IOException {
         this.port = port;
         mContext = context;
-        mHandlerFactory = handlerFactory;
         // setup non blocking io
         selector = Selector.open();
         sschannel = ServerSocketChannel.open();
         sschannel.configureBlocking(false);
-        address = new InetSocketAddress(port);
+        address = new InetSocketAddress(this.port);
         ServerSocket ss = sschannel.socket();
         ss.bind(address);
         sschannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -97,14 +109,15 @@ public class ProxyServer implements Runnable {
                         Log.d("haha","get new accept");
                         // register read interests after accepting
                         //the handler object will be kept with the key
-                        ProxyHandler handler = mHandlerFactory.getHandler();
+                        ProxyHandler handler = getProxyHandler();
                         clientChannel.register(selector, SelectionKey.OP_READ, handler);
+                        handler.onAccept(key,this);
                     } else if (key.isReadable()) {
                         //handle read events
                         ProxyHandler handler = (ProxyHandler) key.attachment();
                         Log.d("haha server", "selector get new events READ! id:");
                         //let handler handle the read events
-                        handler.onRead(key, (SocketChannel) key.channel());
+                        handler.onRead(key, this);
                     } else if ((key.readyOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //NOTE: Channels do NOT necessarily need to register "write interests" to be writable
                         Log.d("haha server", "selector get new events WRITE!");
@@ -115,7 +128,13 @@ public class ProxyServer implements Runnable {
                 e.printStackTrace();
                 break;
             }
+        }//while ends
+        try{
+            sschannel.close();
+        }catch(IOException e){
+            e.printStackTrace();
         }
+        Log.d("haha","close");
     }
 
     /**
@@ -126,9 +145,8 @@ public class ProxyServer implements Runnable {
      * @param channel channel needs registering
      * @param handler handler of channel events
      */
-    public static void regesterRead(Channel channel,SSLProxyHandler handler){
+    public void regesterRead(Channel channel,ProxyHandler handler){
         synchronized (registerList){
-            Log.d("haha","request re-register:"+handler.handlerId);
             registerList.add(handler);
             registerList.notifyAll();
         }
@@ -141,10 +159,9 @@ public class ProxyServer implements Runnable {
     private void reRegisterReads(){
         synchronized (registerList){
             while(registerList.size()>0){
-                SSLProxyHandler handler = registerList.remove(0);
+                ProxyHandler handler = registerList.remove(0);
                 try{
-                    Log.d("haha","do re-register:"+handler.handlerId);
-                    handler.channel.register(selector,SelectionKey.OP_READ,handler);
+                    handler.getChannel().register(selector,SelectionKey.OP_READ,handler);
                 }catch (ClosedChannelException e){
                     e.printStackTrace();
                 }
@@ -154,5 +171,8 @@ public class ProxyServer implements Runnable {
 
     public void stop(){
         isRunning = false;
+        selector.wakeup();
     }
+
+    public abstract ProxyHandler getProxyHandler();
 }

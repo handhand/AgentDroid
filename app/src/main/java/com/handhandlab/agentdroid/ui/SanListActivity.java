@@ -29,6 +29,8 @@ public class SanListActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_san_names);
+        getActionBar().setDisplayShowHomeEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         findViewById(R.id.add_name).setOnClickListener(this);
         mEditName = (EditText)findViewById(R.id.san_name);
         mListViewNames = (ListView)findViewById(R.id.san_list);

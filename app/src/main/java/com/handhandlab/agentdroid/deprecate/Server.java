@@ -15,8 +15,6 @@ import java.util.Set;
 import android.content.Context;
 import android.util.Log;
 
-import com.handhandlab.agentdroid.goagent.AgentClient2;
-
 /**
  * <p>
  * Title: 主控服务线程

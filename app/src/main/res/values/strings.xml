@@ -6,8 +6,11 @@
     <string name="service_url">Server Url</string>
     <string name="proxy_apps">Proxy App</string>
     <string name="san">Set Subject Alternative Name</string>
+    <string name="san_add">Add Subject Alternative Name</string>
     <string name="http_service">Start HTTP Proxy</string>
     <string name="https_service">Start HTTPS Proxy</string>
     <string name="all_service">Start Proxy</string>
     <string name="stop_service">STOP</string>
+    <string name="add">+</string>
+    <string name="prompt_set_url_first">Please set server url first</string>
 </resources>

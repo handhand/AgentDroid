@@ -1,9 +1,10 @@
-package com.handhandlab.agentdroid.proxy;
+package com.handhandlab.agentdroid.deprecate;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.handhandlab.agentdroid.goagent.AgentClient2;
+import com.handhandlab.agentdroid.deprecate.AgentClient2;
+import com.handhandlab.agentdroid.proxy.HttpProxyHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -70,7 +71,7 @@ public class Server2 implements Runnable {
                     } else if (key.isReadable()) {
                         HttpProxyHandler handler = (HttpProxyHandler) key.attachment();
                         Log.d("haha server", "selector get new events READ! id:"+handler.handlerId);
-                        handler.onRead(key, (SocketChannel) key.channel());
+                        //handler.onRead(key, (SocketChannel) key.channel());
                     } else if ((key.readyOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         Log.d("haha server", "selector get new events WRITE!");
                     }

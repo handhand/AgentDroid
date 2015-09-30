@@ -1,45 +1,39 @@
 package com.handhandlab.agentdroid.ui;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.handhandlab.agentdroid.R;
-import com.handhandlab.agentdroid.cert.CertHelper;
-import com.handhandlab.agentdroid.proxy.Server2;
-import com.handhandlab.agentdroid.proxy.ServerSSL;
+import com.handhandlab.agentdroid.dns.DNSIntercepter;
+import com.handhandlab.agentdroid.openssl.OpensslWrapper;
 import com.handhandlab.agentdroid.system.InitAsyncTask;
 import com.handhandlab.agentdroid.system.InitScript;
-import com.handhandlab.agentdroid.system.Shell;
-import com.handhandlab.agentdroid.test.TestHandler;
-import com.handhandlab.agentdroid.test.TestServer;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import com.handhandlab.agentdroid.utils.DataUtils;
+import com.handhandlab.agentdroid.utils.Utils;
 
 
-public class MainActivity extends ActionBarActivity implements ServiceConnection,View.OnClickListener{
+public class MainActivity extends Activity implements ServiceConnection,View.OnClickListener{
 
+    static{
+        System.loadLibrary("agentdroid");
+    }
     ProxyService proxyService;
+    TextView tvUrl;
     Button btnStartService;
     Button btnSSLProxy;
     Button btnHTTPProxy;
@@ -49,115 +43,46 @@ public class MainActivity extends ActionBarActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        findViewById(R.id.test_server).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TestServer nioServer = new TestServer(8080, new TestHandler());
-                Thread t = new Thread(nioServer);
-                t.start();
-
-            }
-        });
-
-        /**
-         * start http proxy server
-         */
-        findViewById(R.id.test_http_server).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                try {
-                    Server2 nioServer = new Server2(getApplicationContext(),8899);
-                    Thread t = new Thread(nioServer);
-                    t.start();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                //与服务端建立连接
-                /*Thread d = new Thread(){
-                    @Override
-                    public void run() {
-                        try{
-                            String host = "127.0.0.1";  //要连接的服务端IP地址
-                            int port = 8080;   //要连接的d服务端对应的监听端口
-                            client = new Socket(host, port);
-                            String s = "hahathisisreally";
-                            Writer writer = new OutputStreamWriter(client.getOutputStream());
-                            writer.write(s);
-                            writer.flush();
-                            Thread.sleep(1000);
-                            String ss = "reallyreallylong";
-                            writer.write(ss);
-                            writer.flush();//写完后要记得flush
-                            Log.d("haha","client write finished");
-                            InputStream is = client.getInputStream();
-                            byte[] buffer = new byte[100];
-                            int read = is.read(buffer);
-                            Log.d("haha","client:"+new String(buffer,0,read));
-                            client.close();
-                            StringBuilder sb = new StringBuilder();
-                        }catch (IOException ioe){
-                            ioe.printStackTrace();
-                        }catch(InterruptedException ie){
-                            ie.printStackTrace();
-                        }
-                    }
-                };
-                d.start();*/
-
-
-            }
-        });
-
-
-
-        findViewById(R.id.test_ssl_proxy).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Thread(){
-                    @Override
-                    public void run() {
-                        try{
-                            InitScript.startSSLIntercept(MainActivity.this,"");
-                        }catch (UnknownHostException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-
-                try {
-                    ServerSSL SSLProxyServer = new ServerSSL(getApplicationContext(),8899);
-                    Thread t = new Thread(SSLProxyServer);
-                    t.start();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
+        checkInit();
+        tvUrl = (TextView)findViewById(R.id.tv_url);
+        tvUrl.setText(DataUtils.getUrl(this));
         //init app
-        findViewById(R.id.btn_init).setOnClickListener(this);
+        //findViewById(R.id.btn_init).setOnClickListener(this);//for debug
         //set san names
         findViewById(R.id.btn_san_names).setOnClickListener(this);
         //set proxy app
         findViewById(R.id.btn_proxy_apps).setOnClickListener(this);
+        //set url
+        findViewById(R.id.service_url).setOnClickListener(this);
+        btnHTTPProxy = (Button)findViewById(R.id.start_http_service);//start http proxy
+        btnStop = (Button)findViewById(R.id.stop_service);//stop service
+        btnSSLProxy = (Button)findViewById(R.id.start_https_service);//start https proxy
+        btnStartService = (Button)findViewById(R.id.start_service);//start http and https proxy
 
-        btnStartService = (Button)findViewById(R.id.start_http_service);
-        btnStop = (Button)findViewById(R.id.stop_service);
-        btnSSLProxy = (Button)findViewById(R.id.start_https_service);
+        btnHTTPProxy.setOnClickListener(this);
+        btnSSLProxy.setOnClickListener(this);
         btnStartService.setOnClickListener(this);
         btnStop.setOnClickListener(this);
+
+        //check if the service is already running
+        if(ProxyService.isRunning){
+            Intent i = new Intent(this,ProxyService.class);
+            //bindService(i, this, 0);
+            setButtonsState(false);
+        }
     }
 
     @Override
     public void onClick(View v) {
         Intent i;
         switch (v.getId()){
-            //init ca, iptables, redsocks etc.
+            case R.id.service_url:
+                openDialog();
+                break;
+            //init ca, iptables, redsocks etc., for debug
             case  R.id.btn_init:
                 AsyncTask task = new InitAsyncTask(getApplicationContext());
-                task.execute(new String[]{});
+                task.execute(new Object[]{});
                 v.setEnabled(false);
                 break;
             //setup proxied apps
@@ -167,22 +92,36 @@ public class MainActivity extends ActionBarActivity implements ServiceConnection
                 break;
             //setup subject alternative names of ssl certificates
             case R.id.btn_san_names:
+                Log.d("haha","path:"+this.getFilesDir().getAbsolutePath());
+                OpensslWrapper.genCA(this.getFilesDir().getAbsolutePath()+"/");
                 i = new Intent(getApplicationContext(),SanListActivity.class);
                 startActivity(i);
+                /*Thread thread = new Thread(new DNSIntercepter());
+                thread.start();
+                InitScript.interceptDns(MainActivity.this);
+                btnStop.setEnabled(true);*/
                 break;
             case R.id.start_http_service:
-                Intent intent = new Intent(MainActivity.this,ProxyService.class);
-                intent.putExtra(ProxyService.EXTRA_MODE,ProxyService.MODE_HTTP);
-                getApplicationContext().bindService(intent, MainActivity.this, Context.BIND_AUTO_CREATE);
-                v.setEnabled(false);
-                btnStop.setEnabled(true);
+                startService(ProxyService.MODE_HTTP);
+                break;
+            case R.id.start_https_service:
+                startService(ProxyService.MODE_HTTPS);
+                break;
+            case R.id.start_service:
+               startService(ProxyService.MODE_ALL);
                 break;
             case R.id.stop_service:
-                getApplicationContext().unbindService(this);
-                v.setEnabled(false);
-                btnStartService.setEnabled(true);
+                //getApplicationContext().unbindService(this);
+                i = new Intent(MainActivity.this,ProxyService.class);
+                stopService(i);
+                setButtonsState(true);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -195,23 +134,71 @@ public class MainActivity extends ActionBarActivity implements ServiceConnection
 
     }
 
-
-
-    /**
-     * leave out redsocks
-     */
-    private void start(final String serverDomain) {
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    InitScript.startHTTPIntercept(MainActivity.this,"handhand.eu5.org");
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            }
-        };
-        t.start();
+    private void startService(int mode){
+        if(TextUtils.isEmpty(tvUrl.getText())){
+            Toast.makeText(this,R.string.prompt_set_url_first,Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent i;
+        i = new Intent(MainActivity.this,ProxyService.class);
+        i.putExtra(ProxyService.EXTRA_MODE,mode);
+        startService(i);
+        //bindService(i,this,0);
+        setButtonsState(false);
     }
 
+    private void checkInit(){
+        if(DataUtils.isInit(this)==false){
+            InitAsyncTask initTask = new InitAsyncTask(this);
+            initTask.execute(new String[]{});
+        }
+    }
+
+    private void setButtonsState(boolean isEnable){
+        btnHTTPProxy.setEnabled(isEnable);
+        btnSSLProxy.setEnabled(isEnable);
+        btnStartService.setEnabled(isEnable);
+        btnStop.setEnabled(!isEnable);
+    }
+
+    private void openDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater li = LayoutInflater.from(this);
+        View promptsView = li.inflate(R.layout.dialog_edit, null);
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.edit_url);
+        userInput.setText(tvUrl.getText());
+        // set dialog message
+        alertDialogBuilder
+                .setTitle("Set url")
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // get user input and set it to result
+                                // edit text
+                                String input = userInput.getText().toString();
+                                if (Utils.isUrl(input)) {
+                                    tvUrl.setText(input);
+                                    DataUtils.saveUrl(MainActivity.this,input);
+                                } else {
+                                    Toast.makeText(MainActivity.this,"Not a url",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+
+    }
 }

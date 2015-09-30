@@ -1,8 +1,8 @@
-package com.handhandlab.agentdroid.goagent;
+package com.handhandlab.agentdroid.deprecate;
 
 import android.util.Log;
 
-import com.handhandlab.agentdroid.proxy.HandHttpRequest;
+import com.handhandlab.agentdroid.proxy.HandyHttpRequest;
 import com.handhandlab.agentdroid.proxy.HttpHelper;
 import com.handhandlab.agentdroid.proxy.HttpProxyHandler;
 
@@ -141,7 +141,7 @@ public class AgentClient2 extends Thread{
      * encode body
      * @return
      */
-    public byte[] encodeBody(HandHttpRequest request,int id){
+    public byte[] encodeBody(HandyHttpRequest request,int id){
         //assemble request header, against the protocol of goagent
         StringBuilder sb = new StringBuilder();
         sb.append(request.getMethod()).append(" ");
@@ -206,9 +206,9 @@ public class AgentClient2 extends Thread{
     }
 
     public static class AgentTask{
-        HandHttpRequest request;
+        HandyHttpRequest request;
         HttpProxyHandler handler;//pass in handler instead of channel, because we might use SSL, can not directly write to channel
-        public AgentTask(HandHttpRequest request, HttpProxyHandler handler){
+        public AgentTask(HandyHttpRequest request, HttpProxyHandler handler){
             this.request = request;
             this.handler = handler;
         }

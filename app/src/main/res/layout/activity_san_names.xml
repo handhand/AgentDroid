@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="58dp"
         android:gravity="center_vertical">
         <EditText
             android:id="@+id/san_name"
-            android:layout_width="0dp"
+            android:layout_width="48dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
-            android:hint="Subject Alternative Names"/>
+            android:layout_weight="0.85"
+            android:hint="@string/san_add"
+            android:layout_marginBottom="4dp"/>
         <Button
             android:id="@+id/add_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:text="add"/>
+            android:layout_weight="0.15"
+            android:text="@string/add"
+            style="@style/main_button"/>
     </LinearLayout>
+    <include layout="@layout/view_divider"/>
     <ListView
         android:id="@+id/san_list"
         android:layout_width="match_parent"
