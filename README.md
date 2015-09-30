@@ -21,7 +21,7 @@ _2.5.In HTTPS's case, the proxy will do a MITM and act as the HTTPS server itsel
 
 ####In general:
 
-Apps <-> [ Iptables <-> Redsocks <-> AgentDroid Java Codes ]* <-> GoAgent PHP script
+Apps <-> [ Iptables <-> AgentDroid Java Codes ]* <-> GoAgent PHP script
 
 *_these are inside AgentDroid_
 
@@ -33,9 +33,12 @@ _Your phone must be rooted and its build version is greater than 4.0._
 
 1. Find a php hosting site which __supports CURL__ (just google "php hosting curl");
 2. Register and login;
-3. Upload the __index.php__ file in the GoAgent project to any directory in your site;
-4. Open app and set the url of the index.php file, and set which apps should be proxied.
-5. Start the proxied app and use it.
+3. Upload the __index.php__ file in the [GoAgent](https://github.com/goagent/goagent) project to any directory in your site; Or, since now GoAgent project is closed, you can use the __agentdroid.php__ file in the php folder _NOTE: AgentDroid must work with Goagent v3.1.2_
+ 
+4. The __test\_curl.php__ script in the php folder is to help you check whether your php host is capable to deliver your request: Upload test_curl.php, and in your browser access the page http://your\_php\_host/test\_curl.php?url=http://www.handhandlab.com, if browser shows the content of handhandlab.com, then your host is good to go!
+
+5. Open app and set the url of the index.php file, and set which apps should be proxied.
+6. Start the proxied app and use it.
 
 
 ## What may interest you
@@ -68,6 +71,12 @@ AgentDroid即为一个与GoAgent PHP端通信的Android客户端APP。
 AgentDroid is depending on the following excellent projects:
 
 * [GoAgent](https://github.com/goagent/goagent)
-* [Redsocks](https://github.com/darkk/redsocks) 
+* [Openssl](https://github.com/openssl/openssl)
 
 Also, AgentDroid can not be made without many other great blogs and websites, I will list them on the corresponding WIKI pages.
+
+## Major Updates
+
+####2015.09.30
+* Use native openssl to generate CA certificate, key pairs and certificates.
+
