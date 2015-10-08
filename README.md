@@ -60,18 +60,41 @@ Although some of the implementations may be simple or even buggy, but they demos
 
 ## 中文说明
 
-GoAgent是一个科学上网的工具，大部分人都使用它的AppEngine端的功能，而PHP端确实被忽略的一大利器。
+GoAgent是一个科学上网的工具，大部分人都使用它的AppEngine端的功能，而PHP端却是被忽略的一大利器。
 
 Google AppEngine目标固定，容易被blocked，相反，提供PHP网页寄存（Hosting）服务的网站多如牛毛，而且经常有新的提供商出来，使得伟大的火墙很难把它们一网打尽。
 
 AgentDroid即为一个与GoAgent PHP端通信的Android客户端APP。
+
+####使用
+
+1. 搜索支持Curl的PHP Hosting网站，注册登录。
+2. 上传agentdroid.php
+3. 在AgentDroid中设置agentdroid.php的url
+4. 选择需要被代理的App
+
+####原理
+
+通过iptables将android的80和443端口流量重定向到AgentDroid监听的端口；
+
+在80端口的情况下（HTTP明文），AgentDroid解析Http请求，根据GoAgent的协议向PHP服务端请求数据并返回。
+
+在443端口情况下（HTTPS），AgentDroid在初始化时生成一个证书，放入Android的/etc/security/cacerts/中，Android即会将该证书作为根证书。同时证书的私钥保存在App私有目录中。
+
+AgentDroid被代理的APP建立SSL连接（中间人攻击），证书动态生成，由之前保存的私钥进行签名，由于在连接建立之前无法知道原来的流量去往的域名，所以通过证书的Subject Alternative Name来绕过浏览器对证书域名的检查。
+
+####Donwload
+
+需要apk的同学可以在[Handhand Lab](http://www.handhandlab.com/downloads.html)下载。
 
 ## Acknowledgment
 
 AgentDroid is depending on the following excellent projects:
 
 * [GoAgent](https://github.com/goagent/goagent)
-* [Openssl](https://github.com/openssl/openssl)
+* [OpenSSL](https://github.com/openssl/openssl)
+* [BouncyCastle](https://www.bouncycastle.org/)
+* [SpongyCastle](https://github.com/rtyley/spongycastle)
 
 Also, AgentDroid can not be made without many other great blogs and websites, I will list them on the corresponding WIKI pages.
 
